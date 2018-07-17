@@ -12,6 +12,7 @@ var uuid = require("uuid");
 var secp256k1 = require("secp256k1/elliptic");
 var createKeccakHash = require("keccak/js");
 
+
 function isFunction(f) {
   return typeof f === "function";
 }
@@ -508,7 +509,7 @@ module.exports = {
    * @param {function=} cb Callback function (optional).
    * @return {Object} Keystore data file's contents.
    */
-  importFromFile: function (address, datadir, cb) {
+  importFromDirectory: function (address, datadir, cb) {
     var keystore, filepath, path, fs;
     if (this.browser) throw new Error("method only available in Node.js");
     path = require("path");
@@ -548,6 +549,26 @@ module.exports = {
       }
       return cb(JSON.parse(fs.readFileSync(filepath)));
     });
+  },
+  /**
+   * Import key data object from keystore JSON file.
+   * (Note: Node.js only!)
+   * @param {string=} filepath Keystore file path
+   * @param {function=} cb Callback function (optional).
+   * @return {Object} Keystore data file's contents.
+   */
+  importFromFile: function (filepath, cb) {
+    var fs= require("fs");
+
+    if (!isFunction(cb)) {
+      if (!filepath) {
+        throw new Error("could not find key file for address " + filepath);
+      }
+      return JSON.parse(fs.readFileSync(filepath));
+    }
+    return cb(JSON.parse(fs.readFileSync(filepath)));
   }
 
 };
+
+
